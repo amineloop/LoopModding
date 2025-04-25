@@ -1,0 +1,56 @@
+{
+  // Identifier of the mod (used for debugging)
+  "modName": "ExampleAllParameters",
+
+  // Name of the event that will trigger this mod
+  "eventName": "OnPlayerSpawn",
+
+  // The action to perform when the event is triggered
+  "action": "TeleportPlayer",
+
+  // === COMMON PARAMETERS ===
+
+  // Message for PrintMessage, Chat or Broadcast actions
+  "message": "Welcome {name} to the arena!",
+
+  // Float value (used by Heal, SpeedBoost, etc.)
+  "amountFloat": 25.5,
+
+  // Integer value (used by AddScore, GiveItem, etc.)
+  "amountInt": 3,
+
+  // Boolean switch (used by actions like Freeze, ShowHUD, etc.)
+  "boolean": true,
+
+  // Position to teleport to or use for spawning (absolute coordinates)
+  "position": [5.0, 1.5, -3.2],
+
+  // Reference to a position file in Mods/Positions (e.g. base_camp.json)
+  "usePositionKey": "base_camp",
+
+  // === ADVANCED OPTIONS ===
+
+  // Delay (in seconds) before executing the action
+  "delaySeconds": 2.5,
+
+  // Repeat this action N times
+  "repeatCount": 1,
+
+  // Filter targets by tag (ex: only affect "Enemy" tagged objects)
+  "tagFilter": "Enemy",
+
+  // Radius (used for area-of-effect actions)
+  "radius": 10.0,
+
+  // Target a specific GameObject by name (if applicable)
+  "targetName": "Player",
+
+  // Name of a prefab to spawn (must be registered in code)
+  "prefabName": "ExplosionEffect",
+
+  // Name of a sound to play (must exist in your audio manager)
+  "soundName": "VictoryFanfare",
+
+  // Random offset to apply to the position (adds variation)
+  "randomOffset": [1.0, 0.0, 1.0]
+}

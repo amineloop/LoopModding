@@ -1,0 +1,8 @@
+{
+  "modName": "ReloadFolders",
+  "eventName": "ReloadFolders",
+  "action": "ReloadFolders",
+  "args": {
+    "message": "Reloaded folders"
+  }
+}
