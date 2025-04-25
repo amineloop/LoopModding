@@ -5,6 +5,8 @@ Its goal is to streamline how .json mods and parameters can be used to trigger i
 The system includes basic demo actions (like PrintMessage, TeleportPlayer) — but YOU are responsible for writing your own APIs for production usage.
 =====================================================
 
+# LoopModding
+
 LoopModding is a simple, flexible and JSON-based modding framework for Unity games. It allows you to trigger actions through mod files and centralize game logic through a ModManager + ModAPI system.
 
 ✨ Features
