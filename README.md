@@ -1,22 +1,45 @@
-🔧 LoopModding - Lightweight Modding System for Unity
-=====================================================
+DISCLAIMER:
+===========
+This is a simplified system inspired by SAMP's filterscript logic.
+Its goal is to streamline how .json mods and parameters can be used to trigger in-game Unity actions.
+The system includes basic demo actions (like PrintMessage, TeleportPlayer) — but YOU are responsible for writing your own APIs for production usage.
+Created by: AMINE
 
-LoopModding is a simple, flexible and JSON-based modding framework for Unity games. It allows you to trigger actions through mod files and centralize game logic through a ModManager + ModAPI system.
+# LoopModding
 
-✨ Features
------------
-- 💡 Event-based mod execution
-- 🧠 Parametric logic with support for @parameters
-- ⚡ Hot-reload support (manually via Reload button)
-- 🛠️ Simple JSON mod files in `Mods/Addons`
-- 💬 Chat/message injection, teleportation, etc.
-- 📁 Global `parameters.json` support via `@` placeholders
+LoopModding is a lightweight JSON-based modding framework for Unity that enables you to trigger game events and actions via easily editable `.json` files.
 
-🧩 Mod Structure
-----------------
-A mod is a `.json` file placed in `Mods/Addons/` and looks like:
+This system is designed for:
+- Designers to easily define logic outside the Unity Editor
+- Developers to expose game functionality in a modular and extensible way
+- Servers or solo games that want runtime reactivity without recompiling
 
-```json
+---
+
+## 🧠 Features
+
+- 🔄 Trigger events by name (`OnPlayerDead`, `OnPlayerArrested`, etc.)
+- 🧩 Map events to actions using `.json` files
+- 🗃️ Load global parameters (like positions, names, etc.) from external `.json`
+- 📦 Hot-reload mods and parameters at runtime
+- ✅ Centralized `ModAPI` to register your own game actions
+- ✨ Support for shared arguments (like `chatMessage`, `soundName`, etc.)
+
+---
+
+## 📁 Folder structure
+
+/Mods
+  ├── Addons/
+  │     └── my_mod.json
+  └── Parameters/
+        └── positions.json
+
+---
+
+## ✅ Example mod
+
+my_mod.json:
 {
   "modName": "TeleportOnArrest",
   "eventName": "OnPlayerArrested",
@@ -25,77 +48,33 @@ A mod is a `.json` file placed in `Mods/Addons/` and looks like:
     "x": "@prisonX",
     "y": "@prisonY",
     "z": "@prisonZ",
-    "chatMessage": "You have been teleported to prison!"
+    "chatMessage": "You have been arrested and sent to @prisonName!"
   }
 }
-```
 
-📂 Parameters Example
----------------------
-In `Mods/Parameters/positions.json`:
-
-```json
+positions.json:
 {
-  "prisonX": -5.0,
-  "prisonY": 1.2,
-  "prisonZ": 3.5
+  "prisonX": -10.0,
+  "prisonY": 1.0,
+  "prisonZ": 3.5,
+  "prisonName": "Central Jail"
 }
-```
 
-🔄 Event Triggering
--------------------
-Internally, events are triggered via:
+---
 
-```csharp
-ModManager.Instance.TriggerEvent("OnPlayerArrested");
-```
+## 🧪 Register your own actions
 
-This executes all loaded mods that listen to `OnPlayerArrested`.
+ModAPI.Register("TakeMoney", args => {
+    int amount = args["amount"].AsInt;
+    PlayerWallet.Remove(amount);
+});
 
-🧠 Common Args (Automatically Handled)
---------------------------------------
-You can attach these special arguments to any mod, no matter the action:
+---
 
-| Arg            | Description                         |
-|----------------|-------------------------------------|
-| chatMessage    | Displays a message in the chat      |
-| playSound      | (Coming soon) Play a named sound    |
-| screenShake    | (Coming soon) Triggers camera shake |
+## ⚠️ Reminder
 
-These are handled automatically after the main action is executed.
+LoopModding provides a flexible base.
+You can register your own game logic and actions using `ModAPI.Register(...)`.
+The system handles loading, hot-reloading, and triggering based on events and `.json` structures.
 
-🧰 Built-in Actions
--------------------
-| Action           | Description                            |
-|------------------|----------------------------------------|
-| TeleportPlayer   | Teleports the player to x/y/z          |
-| PrintMessage     | Logs a message (use chatMessage too)   |
-| ReloadFolders    | Reload mods and parameters at runtime  |
-
-More can be registered using:
-
-```csharp
-ModAPI.Register("MyAction", args => { ... });
-```
-
-🚀 Getting Started
-------------------
-1. Clone or drop the `/LoopModding` folder into your Unity project
-2. Attach `ModManager` to a GameObject in your startup scene
-3. Add your `.json` mods in `Mods/Addons/`
-4. (Optional) Add global variables in `Mods/Parameters/`
-
-📄 Folder Structure
--------------------
-/Mods
- ├── /Addons          ← all .json mods here
- └── /Parameters       ← global values used via @ref
-
-📜 License
-----------
-MIT — free to use and modify.
-
-💬 Credits
-----------
-Created by [your name]  
-Inspired by lightweight scripting systems (SAMP Filterscripts, JSON logic etc.)
+MIT License - Extend and build upon it!
