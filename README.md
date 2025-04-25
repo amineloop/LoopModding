@@ -1,8 +1,10 @@
-```DISCLAIMER:
+```
+DISCLAIMER:
 ===========
 This is a simplified system inspired by SAMP's filterscript logic.
 Its goal is to streamline how .json mods and parameters can be used to trigger in-game Unity actions.
-The system includes basic demo actions (like PrintMessage, TeleportPlayer) — but YOU are responsible for writing your own APIs for production usage.
+The system includes basic demo actions (like PrintMessage, TeleportPlayer)
+but YOU are responsible for writing your own APIs for production usage.
 =====================================================
 ```
 
