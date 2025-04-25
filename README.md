@@ -94,12 +94,6 @@ ModAPI.Register("MyAction", args => { ... });
 3. Add your `.json` mods in `Mods/Addons/`
 4. (Optional) Add global variables in `Mods/Parameters/`
 
-📄 Folder Structure
--------------------
-/Mods
- ├── /Addons          ← all .json mods here
- └── /Parameters       ← global values used via @ref
-
 📜 License
 ----------
 MIT — free to use and modify.
