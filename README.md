@@ -31,11 +31,11 @@ It allows you to trigger actions through mod files and centralize game logic thr
 ✨ Features
 -----------
 - 💡 Event-based mod execution  
-- 🧠 Parametric logic with support for `@parameters`  
+- 🧠 Parametric logic with support for `@references`  
 - ⚡ Hot-reload support (manually via Reload button)  
 - 🛠️ Simple JSON mod files in `Mods/Addons`  
 - 💬 Chat/message injection, teleportation, etc.  
-- 📁 Global `parameters.json` support via `@` placeholders  
+- 📁 Global `references.json` support via `@` placeholders  
 
 🧩 Mod Structure
 ----------------
@@ -43,14 +43,21 @@ A mod is a `.json` file placed in `Mods/Addons/` and looks like:
 
 ```json
 {
-  "modName": "TeleportOnArrest",
-  "eventName": "OnPlayerArrested",
-  "action": "TeleportPlayer",
-  "args": {
-    "x": "@prisonX",
-    "y": "@prisonY",
-    "z": "@prisonZ",
-    "chatMessage": "You have been teleported to prison!"
+  "modName": "ColorText",
+  "eventName": "OnGameStart",
+
+  "DrawText": {
+    "text": "Hello World",
+    "color": "@warningColor",
+    "x": 100,
+    "y": 200,
+    "size": 24,
+    "countdown": 5
+  },
+  "TeleportPlayer": {
+    "x": "@spawnX",
+    "y": "@spawnY",
+    "z": "@spawnZ"
   }
 }
 ```
