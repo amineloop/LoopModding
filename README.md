@@ -95,17 +95,34 @@ These are handled automatically after the main action is executed.
 
 🧰 Built-in Actions
 -------------------
-| Action           | Description                            |
-|------------------|----------------------------------------|
-| TeleportPlayer   | Teleports the player to x/y/z          |
-| PrintMessage     | Logs a message (use chatMessage too)   |
-| ReloadFolders    | Reload mods and parameters at runtime  |
+| Action            | Description                                             |
+|-------------------|---------------------------------------------------------|
+| ReloadFolders     | Reload mods and parameters at runtime                   |
+| PrintMessage      | Logs a message (use chatMessage too)                    |
+| OnPlayerArrested  | Teleports the player or prints a message for that event |
+| TeleportPlayer    | Teleports the player to x/y/z                           |
 
-More can be registered using:
+All built-in actions are automatically discovered at startup. To add your own, create a new C# script that inherits from `ModApiAction` and override `ActionName` + `Execute`:
 
 ```csharp
-ModAPI.Register("MyAction", args => { ... });
+using LoopModding.Core.API;
+using SimpleJSON;
+using UnityEngine;
+
+public class HealPlayerAction : ModApiAction
+{
+    public override string ActionName => "HealPlayer";
+
+    public override void Execute(JSONNode args)
+    {
+        int amount = args?["amount"].AsInt ?? 25;
+        PlayerStats.Instance.Heal(amount);
+        Debug.Log($"[MOD] Healed player for {amount} HP");
+    }
+}
 ```
+
+The class will be registered automatically thanks to the base class. You can still manually register actions at runtime with `ModAPI.Register(...)` if you need full control.
 
 🚀 Getting Started
 ------------------

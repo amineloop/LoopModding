@@ -4,7 +4,8 @@ using System.Linq;
 using SimpleJSON;
 using UnityEngine;
 
-namespace LoopModding.Core.API{
+namespace LoopModding.Core.API
+{
 
     /// <summary>
     /// Public static API used by mods to interact with the game.
@@ -17,62 +18,7 @@ namespace LoopModding.Core.API{
         // Called once when class is first accessed
         static ModAPI()
         {
-            // Register default actions here
-            Register("ReloadFolders", args =>
-            {
-                ModManager.Instance.ReloadFolders();
-                Debug.Log("[MOD] Reloaded folders.");
-            });
-
-            Register("PrintMessage", args =>
-            {
-                if (args.HasKey("chatMessage"))
-                {
-                    string msg = args["chatMessage"];
-                    GameManager.instance.chatText.text += msg + "\n";
-                }
-                else
-                {
-                    Debug.LogWarning("[MOD] PrintMessage missing 'chatMessage' argument.");
-                }
-            });
-
-            Register("OnPlayerArrested", args =>
-            {
-                if (args.HasKey("x") && args.HasKey("y") && args.HasKey("z"))
-                {
-                    float x = args["x"].AsFloat;
-                    float y = args["y"].AsFloat;
-                    float z = args["z"].AsFloat;
-                    GameManager.instance.playerTransform.position = new Vector3(x, y, z);
-                }else if(args.HasKey("chatMessage"))
-                {
-                    string msg = args["chatMessage"];
-                    GameManager.instance.chatText.text += msg + "\n";
-                }
-                else
-                {
-                    Debug.LogWarning("[MOD] OnPlayerArrested missing 'x/y/z' or 'chatMessage' argument.");
-                }
-            });
-
-            Register("TeleportPlayer", args =>
-            {
-                if (args.HasKey("x") && args.HasKey("y") && args.HasKey("z"))
-                {
-                    float x = args["x"].AsFloat;
-                    float y = args["y"].AsFloat;
-                    float z = args["z"].AsFloat;
-                    GameManager.instance.playerTransform.position = new Vector3(x, y, z);
-                    // PlayerController.Instance.TeleportTo(x, y, z); // Optional
-                }
-                else
-                {
-                    Debug.LogWarning("[MOD] TeleportPlayer missing x/y/z values.");
-                }
-            });
-
-            // Add more default actions here, like "TakeMoney", "PlaySound", etc.
+            AutoRegisterActions();
         }
 
         /// <summary>
@@ -80,6 +26,18 @@ namespace LoopModding.Core.API{
         /// </summary>
         public static void Register(string actionName, Action<JSONNode> callback)
         {
+            if (string.IsNullOrWhiteSpace(actionName))
+            {
+                Debug.LogWarning("[ModAPI] Attempted to register an action with an empty name.");
+                return;
+            }
+
+            if (callback == null)
+            {
+                Debug.LogWarning($"[ModAPI] Attempted to register action '{actionName}' with a null callback.");
+                return;
+            }
+
             if (!registry.ContainsKey(actionName))
             {
                 registry[actionName] = callback;
@@ -115,6 +73,11 @@ namespace LoopModding.Core.API{
         /// </summary>
         private static void HandleCommonArgs(JSONNode args)
         {
+            if (args == null)
+            {
+                return;
+            }
+
             if (args.HasKey("chatMessage"))
             {
                 string msg = args["chatMessage"];
@@ -137,6 +100,35 @@ namespace LoopModding.Core.API{
         public static bool HasRegisteredActions()
         {
             return registry.Count > 0;
+        }
+
+        private static void AutoRegisterActions()
+        {
+            var actionBaseType = typeof(ModApiAction);
+            var actionTypes = actionBaseType.Assembly.GetTypes()
+                .Where(t => actionBaseType.IsAssignableFrom(t) && !t.IsAbstract);
+
+            foreach (var type in actionTypes)
+            {
+                try
+                {
+                    if (Activator.CreateInstance(type) is ModApiAction actionInstance)
+                    {
+                        if (actionInstance.ShouldAutoRegister)
+                        {
+                            actionInstance.RegisterSelf();
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[ModAPI] Type '{type.FullName}' could not be instantiated as a ModApiAction.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[ModAPI] Failed to auto-register action '{type.FullName}': {ex}");
+                }
+            }
         }
 
     }
