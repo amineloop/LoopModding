@@ -28,12 +28,12 @@ namespace LoopModding.Core.API{
             {
                 if (args.HasKey("chatMessage"))
                 {
-                    string msg = args["message"];
+                    string msg = args["chatMessage"];
                     GameManager.instance.chatText.text += msg + "\n";
                 }
                 else
                 {
-                    Debug.LogWarning("[MOD] PrintMessage missing 'message' argument.");
+                    Debug.LogWarning("[MOD] PrintMessage missing 'chatMessage' argument.");
                 }
             });
 
