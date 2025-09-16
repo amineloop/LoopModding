@@ -31,40 +31,37 @@ It allows you to trigger actions through mod files and centralize game logic thr
 ✨ Features
 -----------
 - 💡 Event-based mod execution  
-- 🧠 Parametric logic with support for `@references`  
+- 🧠 Parametric logic with support for `@parameters`
 - ⚡ Hot-reload support (manually via Reload button)  
 - 🛠️ Simple JSON mod files in `Mods/Addons`  
 - 💬 Chat/message injection, teleportation, etc.  
-- 📁 Global `references.json` support via `@` placeholders  
+- 📁 Global `parameters.json` support via `@` placeholders
 
 🧩 Mod Structure
 ----------------
-A mod is a `.json` file placed in `Mods/Addons/` and looks like:
+A mod is a `.json` file placed in `Mods/Addons/` and follows this structure:
+
+```json
+{ "modName": "...", "eventName": "...", "action": "...", "args": { ... } }
+```
+
+For instance, a simple welcome message can be defined as:
 
 ```json
 {
-  "modName": "ColorText",
-  "eventName": "OnGameStart",
-
-  "DrawText": {
-    "text": "Hello World",
-    "color": "@warningColor",
-    "x": 100,
-    "y": 200,
-    "size": 24,
-    "countdown": 5
-  },
-  "TeleportPlayer": {
-    "x": "@spawnX",
-    "y": "@spawnY",
-    "z": "@spawnZ"
+  "modName": "WelcomeAdmin",
+  "eventName": "OnNewPlayer",
+  "action": "PrintMessage",
+  "args": {
+    "chatMessage": "Admin privileges detected. Server @serverName",
+    "if": "isAdmin"
   }
 }
 ```
 
-📂 References Example
+📂 Parameters Example
 ---------------------
-In `Mods/References/positions.json`:
+In `Mods/Parameters/positions.json`:
 
 ```json
 {
@@ -102,7 +99,7 @@ These are handled automatically after the main action is executed.
 |------------------|----------------------------------------|
 | TeleportPlayer   | Teleports the player to x/y/z          |
 | PrintMessage     | Logs a message (use chatMessage too)   |
-| ReloadFolders    | Reload mods and references at runtime  |
+| ReloadFolders    | Reload mods and parameters at runtime  |
 
 More can be registered using:
 
@@ -115,7 +112,7 @@ ModAPI.Register("MyAction", args => { ... });
 1. Clone or drop the `/LoopModding` folder into your Unity project
 2. Attach `ModManager` to a GameObject in your startup scene
 3. Add your `.json` mods in `Mods/Addons/`
-4. (Optional) Add global variables in `Mods/References/`
+4. (Optional) Add global variables in `Mods/Parameters/`
 
 📜 License
 ----------
