@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
-using LoopModding.Core;
+using LoopModding.Core.API;
+using SimpleJSON;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LoopModding.Core.Runtime
 {
     /// <summary>
-    /// Handles key and UI button bindings registered through the ModAPI.
+    /// Binds input sources (keyboard/UI) to declarative actions handled by the ActionManager.
     /// </summary>
-    public class ModInputRuntime : MonoBehaviour
+    public class ActionInputBridge : MonoBehaviour
     {
         public enum KeyTrigger
         {
@@ -21,7 +22,8 @@ namespace LoopModding.Core.Runtime
         private class InputBinding
         {
             public string Id;
-            public string EventName;
+            public string ActionId;
+            public JSONNode Payload;
             public KeyCode? Key;
             public KeyTrigger Trigger;
             public float HoldDelay;
@@ -33,35 +35,35 @@ namespace LoopModding.Core.Runtime
         public struct InputBindingOptions
         {
             public string Id;
-            public string EventName;
+            public string ActionId;
+            public JSONNode Payload;
             public KeyCode? Key;
             public KeyTrigger Trigger;
             public float HoldDelay;
             public float RepeatInterval;
             public string ButtonLabel;
             public Vector2 ButtonPosition;
-            public ModUiRuntime.PositionMode ButtonPositionMode;
+            public AddonUiRuntime.PositionMode ButtonPositionMode;
             public Vector2 ButtonSize;
             public Vector2 ButtonPivot;
             public bool ButtonInteractable;
             public float ButtonDuration;
         }
 
-        private const string RuntimeName = "ModInputRuntime";
+        private const string RuntimeName = "ActionInputBridge";
 
-        public static ModInputRuntime Instance { get; private set; }
+        public static ActionInputBridge Instance { get; private set; }
 
         private readonly Dictionary<string, InputBinding> bindings = new();
-        private ModManager cachedManager;
 
-        public static ModInputRuntime EnsureInstance()
+        public static ActionInputBridge EnsureInstance()
         {
             if (Instance != null)
             {
                 return Instance;
             }
 
-            ModInputRuntime existing = FindObjectOfType<ModInputRuntime>();
+            ActionInputBridge existing = FindObjectOfType<ActionInputBridge>();
             if (existing != null)
             {
                 Instance = existing;
@@ -71,7 +73,7 @@ namespace LoopModding.Core.Runtime
 
             GameObject go = new(RuntimeName);
             DontDestroyOnLoad(go);
-            Instance = go.AddComponent<ModInputRuntime>();
+            Instance = go.AddComponent<ActionInputBridge>();
             Instance.Initialize();
             return Instance;
         }
@@ -91,14 +93,14 @@ namespace LoopModding.Core.Runtime
 
         private void Initialize()
         {
-            cachedManager = ModManager.Instance;
+            ActionManager.EnsureInstance();
         }
 
         private void Update()
         {
             foreach (InputBinding binding in bindings.Values)
             {
-                if (binding == null || string.IsNullOrEmpty(binding.EventName))
+                if (binding == null || string.IsNullOrEmpty(binding.ActionId))
                 {
                     continue;
                 }
@@ -120,12 +122,14 @@ namespace LoopModding.Core.Runtime
                     {
                         TriggerBinding(binding);
                     }
+
                     break;
                 case KeyTrigger.Up:
                     if (Input.GetKeyUp(key))
                     {
                         TriggerBinding(binding);
                     }
+
                     break;
                 case KeyTrigger.Held:
                     if (Input.GetKeyDown(key))
@@ -150,24 +154,20 @@ namespace LoopModding.Core.Runtime
                     {
                         binding.NextFireTime = 0f;
                     }
+
                     break;
             }
         }
 
         private void TriggerBinding(InputBinding binding)
         {
-            if (cachedManager == null)
+            if (string.IsNullOrEmpty(binding.ActionId))
             {
-                cachedManager = ModManager.Instance;
-            }
-
-            if (cachedManager == null)
-            {
-                Debug.LogWarning("[ModInputRuntime] Unable to trigger event because ModManager is missing.");
                 return;
             }
 
-            cachedManager.TriggerEvent(binding.EventName);
+            JSONNode payloadClone = binding.Payload != null ? binding.Payload.Clone() : null;
+            ActionManager.EnsureInstance().TriggerAction(binding.ActionId, payloadClone);
         }
 
         public string RegisterBinding(InputBindingOptions options)
@@ -175,7 +175,8 @@ namespace LoopModding.Core.Runtime
             string id = string.IsNullOrWhiteSpace(options.Id) ? Guid.NewGuid().ToString("N") : options.Id;
             InputBinding binding = GetOrCreateBinding(id);
 
-            binding.EventName = options.EventName;
+            binding.ActionId = options.ActionId;
+            binding.Payload = options.Payload != null ? options.Payload.Clone() : null;
             binding.Key = options.Key;
             binding.Trigger = options.Trigger;
             binding.HoldDelay = Mathf.Max(0f, options.HoldDelay);
@@ -184,7 +185,7 @@ namespace LoopModding.Core.Runtime
 
             if (!string.IsNullOrWhiteSpace(options.ButtonLabel))
             {
-                ModUiRuntime uiRuntime = ModUiRuntime.EnsureInstance();
+                AddonUiRuntime uiRuntime = AddonUiRuntime.EnsureInstance();
                 string buttonId = uiRuntime.CreateOrUpdateButton(
                     id,
                     options.ButtonLabel,
@@ -198,11 +199,11 @@ namespace LoopModding.Core.Runtime
                     out Button button);
 
                 binding.Button = button;
-                binding.Button.name = $"ModUIButton_{buttonId}";
+                binding.Button.name = $"ActionUIButton_{buttonId}";
             }
             else if (binding.Button != null)
             {
-                ModUiRuntime.EnsureInstance().RemoveButton(id);
+                AddonUiRuntime.EnsureInstance().RemoveButton(id);
                 binding.Button = null;
             }
 
@@ -224,7 +225,7 @@ namespace LoopModding.Core.Runtime
 
             if (binding.Button != null)
             {
-                ModUiRuntime.EnsureInstance().RemoveButton(id);
+                AddonUiRuntime.EnsureInstance().RemoveButton(id);
             }
 
             bindings.Remove(id);

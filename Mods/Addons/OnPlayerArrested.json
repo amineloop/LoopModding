@@ -1,11 +1,8 @@
 {
-  "modName": "TeleportToJail",
+  "addonName": "OnPlayerArrested",
   "eventName": "OnPlayerArrested",
-  "action": "TeleportPlayer",
+  "action": "OnPlayerArrested",
   "args": {
-    "x": "@prisonX",
-    "y": "@prisonY",
-    "z": "@prisonZ",
-    "chatMessage": "You have been teleported to prison."
+    "reward": 1000
   }
 }

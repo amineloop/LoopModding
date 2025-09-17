@@ -1,18 +1,15 @@
 {
-  "modName": "ShowWelcomeBadge",
+  "addonName": "ShowImageDemo",
   "eventName": "OnNewPlayer",
   "action": "ShowImage",
   "args": {
-    "id": "welcomeBadge",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Logo_Unity_2015.png",
-    "x": 0.9,
-    "y": 0.9,
+    "id": "promoBanner",
+    "url": "https://example.com/banner.png",
     "normalized": true,
-    "width": 256,
-    "height": 256,
-    "rotation": 0,
-    "duration": 8,
-    "preserveAspect": true,
-    "alpha": 0.95
+    "x": 0.5,
+    "y": 0.5,
+    "width": 400,
+    "height": 200,
+    "duration": 10
   }
 }

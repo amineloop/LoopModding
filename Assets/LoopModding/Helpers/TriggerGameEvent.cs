@@ -6,7 +6,7 @@ namespace LoopModding.Helpers{
     public class TriggerGameEvent : MonoBehaviour
     {
         public GameEvents[] gameEvents;
-        ModManager modManager;
+        AddonManager addonManager;
         [Header("Debug")]
         public bool triggerNow;
 
@@ -19,9 +19,9 @@ namespace LoopModding.Helpers{
         }
 
         public void TriggerEvents(){
-            if(modManager == null) modManager = ModManager.Instance;
-            if(modManager == null) {
-                Debug.LogWarning("[TriggerGameEvent] ModManager instance not found.");
+            if(addonManager == null) addonManager = AddonManager.Instance;
+            if(addonManager == null) {
+                Debug.LogWarning("[TriggerGameEvent] AddonManager instance not found.");
                 return;
             }
             if(gameEvents == null || gameEvents.Length == 0) return;
@@ -38,7 +38,7 @@ namespace LoopModding.Helpers{
             }
 
             if(!string.IsNullOrEmpty(eventToTrigger.eventName)){
-                modManager.TriggerEvent(eventToTrigger.eventName);
+                addonManager.TriggerEvent(eventToTrigger.eventName);
             }
 
             if(eventToTrigger.chainedEvents != null){

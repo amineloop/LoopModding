@@ -7,7 +7,7 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Removes a previously registered input binding.
     /// </summary>
-    public class UnbindInputAction : ModApiAction
+    public class UnbindInputAction : AddonApiAction
     {
         public override string ActionName => "UnbindInput";
 
@@ -15,25 +15,25 @@ namespace LoopModding.Core.API
         {
             if (args == null)
             {
-                Debug.LogWarning("[MOD] UnbindInput called without arguments.");
+                Debug.LogWarning("[AddonAPI] UnbindInput called without arguments.");
                 return;
             }
 
             string id = args.HasKey("id") ? args["id"].Value : string.Empty;
             if (string.IsNullOrWhiteSpace(id))
             {
-                Debug.LogWarning("[MOD] UnbindInput requires an 'id' to remove.");
+                Debug.LogWarning("[AddonAPI] UnbindInput requires an 'id' to remove.");
                 return;
             }
 
-            ModInputRuntime runtime = ModInputRuntime.EnsureInstance();
+            ActionInputBridge runtime = ActionInputBridge.EnsureInstance();
             if (runtime.UnregisterBinding(id))
             {
-                Debug.Log($"[MOD] UnbindInput removed binding '{id}'.");
+                Debug.Log($"[AddonAPI] UnbindInput removed binding '{id}'.");
             }
             else
             {
-                Debug.LogWarning($"[MOD] UnbindInput could not find binding '{id}'.");
+                Debug.LogWarning($"[AddonAPI] UnbindInput could not find binding '{id}'.");
             }
         }
     }

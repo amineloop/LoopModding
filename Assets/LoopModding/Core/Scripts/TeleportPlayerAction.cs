@@ -6,7 +6,7 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Teleports the player to the provided coordinates.
     /// </summary>
-    public class TeleportPlayerAction : ModApiAction
+    public class TeleportPlayerAction : AddonApiAction
     {
         public override string ActionName => "TeleportPlayer";
 
@@ -22,7 +22,7 @@ namespace LoopModding.Core.API
             }
             else
             {
-                Debug.LogWarning("[MOD] TeleportPlayer missing x/y/z values.");
+                Debug.LogWarning("[AddonAPI] TeleportPlayer missing x/y/z values.");
             }
         }
     }

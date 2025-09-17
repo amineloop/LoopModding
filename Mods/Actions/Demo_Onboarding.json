@@ -1,0 +1,8 @@
+{
+  "actionId": "demo.onboarding",
+  "events": ["OnNewPlayer"],
+  "description": "Play the onboarding add-ons without waiting for a real player join event.",
+  "category": "Demo",
+  "enabled": true,
+  "priority": 10
+}

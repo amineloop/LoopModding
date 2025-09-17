@@ -6,9 +6,9 @@ using UnityEngine;
 namespace LoopModding.Core.API
 {
     /// <summary>
-    /// Binds a keyboard key and/or UI button to trigger a mod event.
+    /// Binds a keyboard key and/or UI button to trigger a declarative action.
     /// </summary>
-    public class BindInputAction : ModApiAction
+    public class BindInputAction : AddonApiAction
     {
         public override string ActionName => "BindInput";
 
@@ -16,23 +16,33 @@ namespace LoopModding.Core.API
         {
             if (args == null)
             {
-                Debug.LogWarning("[MOD] BindInput called without arguments.");
+                Debug.LogWarning("[AddonAPI] BindInput called without arguments.");
                 return;
             }
 
-            string eventName = args.HasKey("eventName") ? args["eventName"].Value : string.Empty;
-            if (string.IsNullOrWhiteSpace(eventName))
+            string actionId = args.HasKey("actionId") ? args["actionId"].Value : string.Empty;
+            if (string.IsNullOrWhiteSpace(actionId))
             {
-                Debug.LogWarning("[MOD] BindInput requires an 'eventName'.");
+                string legacyEvent = args.HasKey("eventName") ? args["eventName"].Value : string.Empty;
+                if (!string.IsNullOrWhiteSpace(legacyEvent))
+                {
+                    Debug.LogWarning("[AddonAPI] BindInput received deprecated 'eventName'. Use 'actionId' instead.");
+                    actionId = legacyEvent;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(actionId))
+            {
+                Debug.LogWarning("[AddonAPI] BindInput requires an 'actionId'.");
                 return;
             }
 
-            string id = args.HasKey("id") ? args["id"].Value : eventName;
+            string id = args.HasKey("id") ? args["id"].Value : actionId;
             string keyArg = args.HasKey("key") ? args["key"].Value : string.Empty;
             KeyCode? key = TryParseKey(keyArg);
 
             string triggerArg = args.HasKey("trigger") ? args["trigger"].Value : "Down";
-            ModInputRuntime.KeyTrigger trigger = ParseTrigger(triggerArg);
+            ActionInputBridge.KeyTrigger trigger = ParseTrigger(triggerArg);
 
             float holdDelay = args.HasKey("holdDelay") ? Mathf.Max(0f, args["holdDelay"].AsFloat) : 0f;
             float repeatInterval = args.HasKey("repeatInterval") ? Mathf.Max(0f, args["repeatInterval"].AsFloat) : 0f;
@@ -50,15 +60,18 @@ namespace LoopModding.Core.API
 
             if (key == null && string.IsNullOrWhiteSpace(buttonLabel))
             {
-                Debug.LogWarning("[MOD] BindInput requires at least a 'key' or a 'buttonLabel'.");
+                Debug.LogWarning("[AddonAPI] BindInput requires at least a 'key' or a 'buttonLabel'.");
                 return;
             }
 
-            ModInputRuntime runtime = ModInputRuntime.EnsureInstance();
-            ModInputRuntime.InputBindingOptions options = new()
+            JSONNode payload = args.HasKey("payload") ? args["payload"] : null;
+
+            ActionInputBridge runtime = ActionInputBridge.EnsureInstance();
+            ActionInputBridge.InputBindingOptions options = new()
             {
                 Id = id,
-                EventName = eventName,
+                ActionId = actionId,
+                Payload = payload,
                 Key = key,
                 Trigger = trigger,
                 HoldDelay = holdDelay,
@@ -70,14 +83,14 @@ namespace LoopModding.Core.API
                     ? new Vector2(Mathf.Clamp01(buttonX), Mathf.Clamp01(buttonY))
                     : new Vector2(buttonX, buttonY),
                 ButtonPositionMode = buttonNormalized
-                    ? ModUiRuntime.PositionMode.Normalized
-                    : ModUiRuntime.PositionMode.Pixel,
+                    ? AddonUiRuntime.PositionMode.Normalized
+                    : AddonUiRuntime.PositionMode.Pixel,
                 ButtonSize = new Vector2(buttonWidth, buttonHeight),
                 ButtonPivot = new Vector2(buttonPivotX, buttonPivotY)
             };
 
             string registeredId = runtime.RegisterBinding(options);
-            Debug.Log($"[MOD] BindInput registered '{registeredId}' for event '{eventName}'.");
+            Debug.Log($"[AddonAPI] BindInput registered '{registeredId}' for action '{actionId}'.");
         }
 
         private static KeyCode? TryParseKey(string value)
@@ -92,18 +105,18 @@ namespace LoopModding.Core.API
                 return result;
             }
 
-            Debug.LogWarning($"[MOD] BindInput could not parse key '{value}'.");
+            Debug.LogWarning($"[AddonAPI] BindInput could not parse key '{value}'.");
             return null;
         }
 
-        private static ModInputRuntime.KeyTrigger ParseTrigger(string value)
+        private static ActionInputBridge.KeyTrigger ParseTrigger(string value)
         {
-            if (!string.IsNullOrWhiteSpace(value) && Enum.TryParse(value, true, out ModInputRuntime.KeyTrigger trigger))
+            if (!string.IsNullOrWhiteSpace(value) && Enum.TryParse(value, true, out ActionInputBridge.KeyTrigger trigger))
             {
                 return trigger;
             }
 
-            return ModInputRuntime.KeyTrigger.Down;
+            return ActionInputBridge.KeyTrigger.Down;
         }
     }
 }

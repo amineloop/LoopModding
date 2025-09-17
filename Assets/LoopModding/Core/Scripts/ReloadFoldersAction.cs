@@ -7,14 +7,14 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Reloads the mod and parameter folders from disk.
     /// </summary>
-    public class ReloadFoldersAction : ModApiAction
+    public class ReloadFoldersAction : AddonApiAction
     {
         public override string ActionName => "ReloadFolders";
 
         public override void Execute(JSONNode args)
         {
-            ModManager.Instance.ReloadFolders();
-            Debug.Log("[MOD] Reloaded folders.");
+            AddonManager.Instance.ReloadFolders();
+            Debug.Log("[AddonAPI] Reloaded folders.");
         }
     }
 }

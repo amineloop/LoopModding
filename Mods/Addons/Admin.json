@@ -1,8 +1,8 @@
 {
-  "modName": "WelcomeAdmin",
+  "addonName": "WelcomeAdmin",
   "eventName": "OnNewPlayer",
   "action": "PrintMessage",
-  "args":{
+  "args": {
     "chatMessage": "Admin privileges detected. Server @serverName",
     "if": "isAdmin"
   }

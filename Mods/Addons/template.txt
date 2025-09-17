@@ -1,56 +1,55 @@
 {
-  // Identifier of the mod (used for debugging)
-  "modName": "ExampleAllParameters",
+  // Identifier of the add-on (used for debugging)
+  "addonName": "ExampleAllParameters",
 
-  // Name of the event that will trigger this mod
+  // Name of the event that will trigger this add-on
   "eventName": "OnPlayerSpawn",
 
-  // The action to perform when the event is triggered
+  // The AddonAPI action to perform when the event is triggered
   "action": "TeleportPlayer",
 
-  // === COMMON PARAMETERS ===
+  // Arguments passed to the action (structure depends on the action)
+  "args": {
+    // Message for PrintMessage, Chat or Broadcast actions
+    "message": "Welcome {name} to the arena!",
 
-  // Message for PrintMessage, Chat or Broadcast actions
-  "message": "Welcome {name} to the arena!",
+    // Float value (used by Heal, SpeedBoost, etc.)
+    "amountFloat": 25.5,
 
-  // Float value (used by Heal, SpeedBoost, etc.)
-  "amountFloat": 25.5,
+    // Integer value (used by AddScore, GiveItem, etc.)
+    "amountInt": 3,
 
-  // Integer value (used by AddScore, GiveItem, etc.)
-  "amountInt": 3,
+    // Boolean switch (used by actions like Freeze, ShowHUD, etc.)
+    "boolean": true,
 
-  // Boolean switch (used by actions like Freeze, ShowHUD, etc.)
-  "boolean": true,
+    // Position to teleport to or use for spawning (absolute coordinates)
+    "position": [5.0, 1.5, -3.2],
 
-  // Position to teleport to or use for spawning (absolute coordinates)
-  "position": [5.0, 1.5, -3.2],
+    // Reference to a position file in Mods/Positions (e.g. base_camp.json)
+    "usePositionKey": "base_camp",
 
-  // Reference to a position file in Mods/Positions (e.g. base_camp.json)
-  "usePositionKey": "base_camp",
+    // Delay (in seconds) before executing the action
+    "delaySeconds": 2.5,
 
-  // === ADVANCED OPTIONS ===
+    // Repeat this action N times
+    "repeatCount": 1,
 
-  // Delay (in seconds) before executing the action
-  "delaySeconds": 2.5,
+    // Filter targets by tag (ex: only affect "Enemy" tagged objects)
+    "tagFilter": "Enemy",
 
-  // Repeat this action N times
-  "repeatCount": 1,
+    // Radius (used for area-of-effect actions)
+    "radius": 10.0,
 
-  // Filter targets by tag (ex: only affect "Enemy" tagged objects)
-  "tagFilter": "Enemy",
+    // Target a specific GameObject by name (if applicable)
+    "targetName": "Player",
 
-  // Radius (used for area-of-effect actions)
-  "radius": 10.0,
+    // Name of a prefab to spawn (must be registered in code)
+    "prefabName": "ExplosionEffect",
 
-  // Target a specific GameObject by name (if applicable)
-  "targetName": "Player",
+    // Name of a sound to play (must exist in your audio manager)
+    "soundName": "VictoryFanfare",
 
-  // Name of a prefab to spawn (must be registered in code)
-  "prefabName": "ExplosionEffect",
-
-  // Name of a sound to play (must exist in your audio manager)
-  "soundName": "VictoryFanfare",
-
-  // Random offset to apply to the position (adds variation)
-  "randomOffset": [1.0, 0.0, 1.0]
+    // Random offset to apply to the position (adds variation)
+    "randomOffset": [1.0, 0.0, 1.0]
+  }
 }
