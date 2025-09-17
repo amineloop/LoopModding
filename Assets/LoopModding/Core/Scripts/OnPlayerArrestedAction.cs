@@ -6,7 +6,7 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Teleports the player or writes a chat message when the arrest event is triggered.
     /// </summary>
-    public class OnPlayerArrestedAction : ModApiAction
+    public class OnPlayerArrestedAction : AddonApiAction
     {
         public override string ActionName => "OnPlayerArrested";
 
@@ -26,7 +26,7 @@ namespace LoopModding.Core.API
             }
             else
             {
-                Debug.LogWarning("[MOD] OnPlayerArrested missing 'x/y/z' or 'chatMessage' argument.");
+                Debug.LogWarning("[AddonAPI] OnPlayerArrested missing 'x/y/z' or 'chatMessage' argument.");
             }
         }
     }

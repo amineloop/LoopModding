@@ -10,10 +10,10 @@ using UnityEngine.UI;
 namespace LoopModding.Core.Runtime
 {
     /// <summary>
-    /// Runtime helper used by ModAPI actions to spawn UI elements (texts, images, buttons).
+    /// Runtime helper used by AddonAPI actions to spawn UI elements (texts, images, buttons).
     /// Creates a lightweight canvas automatically when first accessed.
     /// </summary>
-    public class ModUiRuntime : MonoBehaviour
+    public class AddonUiRuntime : MonoBehaviour
     {
         public enum PositionMode
         {
@@ -21,9 +21,9 @@ namespace LoopModding.Core.Runtime
             Normalized
         }
 
-        private const string DefaultCanvasName = "ModUIRoot";
+        private const string DefaultCanvasName = "AddonUIRoot";
 
-        public static ModUiRuntime Instance { get; private set; }
+        public static AddonUiRuntime Instance { get; private set; }
 
         [Header("Canvas Setup")]
         [SerializeField] private Canvas rootCanvas;
@@ -41,14 +41,14 @@ namespace LoopModding.Core.Runtime
         private readonly Dictionary<string, Coroutine> textTimers = new();
         private readonly Dictionary<string, Coroutine> buttonTimers = new();
 
-        public static ModUiRuntime EnsureInstance()
+        public static AddonUiRuntime EnsureInstance()
         {
             if (Instance != null)
             {
                 return Instance;
             }
 
-            ModUiRuntime existing = FindObjectOfType<ModUiRuntime>();
+            AddonUiRuntime existing = FindObjectOfType<AddonUiRuntime>();
             if (existing != null)
             {
                 Instance = existing;
@@ -58,7 +58,7 @@ namespace LoopModding.Core.Runtime
 
             GameObject runtimeGo = new(DefaultCanvasName);
             DontDestroyOnLoad(runtimeGo);
-            Instance = runtimeGo.AddComponent<ModUiRuntime>();
+            Instance = runtimeGo.AddComponent<AddonUiRuntime>();
             Instance.Initialize();
             return Instance;
         }
@@ -89,7 +89,7 @@ namespace LoopModding.Core.Runtime
                 return;
             }
 
-            GameObject eventSystemObj = new("ModUI_EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            GameObject eventSystemObj = new("AddonUI_EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             DontDestroyOnLoad(eventSystemObj);
         }
 
@@ -102,7 +102,7 @@ namespace LoopModding.Core.Runtime
 
             if (rootCanvas == null)
             {
-                GameObject canvasObj = new("ModUICanvas");
+                GameObject canvasObj = new("AddonUICanvas");
                 canvasObj.layer = LayerMask.NameToLayer("UI");
                 canvasObj.transform.SetParent(transform, false);
 
@@ -123,7 +123,7 @@ namespace LoopModding.Core.Runtime
 
         private RectTransform CreateLayerRoot(string suffix)
         {
-            GameObject go = new($"ModUI_{suffix}", typeof(RectTransform));
+            GameObject go = new($"AddonUI_{suffix}", typeof(RectTransform));
             RectTransform rect = go.GetComponent<RectTransform>();
             rect.SetParent(rootCanvas.transform, false);
             rect.anchorMin = Vector2.zero;
@@ -314,7 +314,7 @@ namespace LoopModding.Core.Runtime
                 return element;
             }
 
-            GameObject go = new($"ModUIText_{id}");
+            GameObject go = new($"AddonUIText_{id}");
             go.transform.SetParent(textRoot, false);
 
             RectTransform rect = go.AddComponent<RectTransform>();
@@ -332,7 +332,7 @@ namespace LoopModding.Core.Runtime
                 return image;
             }
 
-            GameObject go = new($"ModUIImage_{id}");
+            GameObject go = new($"AddonUIImage_{id}");
             go.transform.SetParent(imageRoot, false);
 
             RectTransform rect = go.AddComponent<RectTransform>();
@@ -350,7 +350,7 @@ namespace LoopModding.Core.Runtime
                 return button;
             }
 
-            GameObject go = new($"ModUIButton_{id}");
+            GameObject go = new($"AddonUIButton_{id}");
             go.transform.SetParent(buttonRoot, false);
 
             RectTransform rect = go.AddComponent<RectTransform>();
@@ -497,7 +497,7 @@ namespace LoopModding.Core.Runtime
         {
             if (string.IsNullOrWhiteSpace(url))
             {
-                Debug.LogWarning($"[ModUI] Invalid image url for id '{id}'.");
+                Debug.LogWarning($"[AddonUI] Invalid image url for id '{id}'.");
                 yield break;
             }
 
@@ -506,7 +506,7 @@ namespace LoopModding.Core.Runtime
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogWarning($"[ModUI] Failed to download image '{url}' for id '{id}': {request.error}");
+                Debug.LogWarning($"[AddonUI] Failed to download image '{url}' for id '{id}': {request.error}");
                 yield break;
             }
 

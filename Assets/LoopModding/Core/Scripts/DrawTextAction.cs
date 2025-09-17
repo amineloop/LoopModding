@@ -9,7 +9,7 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Displays a configurable text element on the mod UI canvas.
     /// </summary>
-    public class DrawTextAction : ModApiAction
+    public class DrawTextAction : AddonApiAction
     {
         public override string ActionName => "DrawText";
 
@@ -17,14 +17,14 @@ namespace LoopModding.Core.API
         {
             if (args == null)
             {
-                Debug.LogWarning("[MOD] DrawText called without arguments.");
+                Debug.LogWarning("[AddonAPI] DrawText called without arguments.");
                 return;
             }
 
             string text = args.HasKey("text") ? args["text"].Value : string.Empty;
             if (string.IsNullOrWhiteSpace(text))
             {
-                Debug.LogWarning("[MOD] DrawText requires a non-empty 'text' argument.");
+                Debug.LogWarning("[AddonAPI] DrawText requires a non-empty 'text' argument.");
                 return;
             }
 
@@ -45,9 +45,9 @@ namespace LoopModding.Core.API
             float pivotX = args.HasKey("pivotX") ? Mathf.Clamp01(args["pivotX"].AsFloat) : 0.5f;
             float pivotY = args.HasKey("pivotY") ? Mathf.Clamp01(args["pivotY"].AsFloat) : 0.5f;
 
-            if (!ModUiRuntime.TryParseColor(colorArg, out Color color))
+            if (!AddonUiRuntime.TryParseColor(colorArg, out Color color))
             {
-                Debug.LogWarning($"[MOD] DrawText received an invalid color '{colorArg}'. Falling back to white.");
+                Debug.LogWarning($"[AddonAPI] DrawText received an invalid color '{colorArg}'. Falling back to white.");
                 color = Color.white;
             }
 
@@ -58,12 +58,12 @@ namespace LoopModding.Core.API
             Vector2? size = (width > 0f && height > 0f) ? new Vector2(width, height) : (Vector2?)null;
             Vector2 pivot = new Vector2(pivotX, pivotY);
 
-            ModUiRuntime runtime = ModUiRuntime.EnsureInstance();
+            AddonUiRuntime runtime = AddonUiRuntime.EnsureInstance();
             string elementId = runtime.DrawText(
                 id,
                 text,
                 position,
-                normalized ? ModUiRuntime.PositionMode.Normalized : ModUiRuntime.PositionMode.Pixel,
+                normalized ? AddonUiRuntime.PositionMode.Normalized : AddonUiRuntime.PositionMode.Pixel,
                 color,
                 fontSize,
                 alignment,
@@ -73,7 +73,7 @@ namespace LoopModding.Core.API
                 pivot,
                 duration);
 
-            Debug.Log($"[MOD] DrawText displayed text with id '{elementId}'.");
+            Debug.Log($"[AddonAPI] DrawText displayed text with id '{elementId}'.");
         }
 
         private static TextAlignmentOptions ParseAlignment(string value)

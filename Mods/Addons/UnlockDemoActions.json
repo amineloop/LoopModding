@@ -1,0 +1,8 @@
+{
+  "addonName": "UnlockDemoActions",
+  "eventName": "OnNewPlayer",
+  "action": "UnlockAction",
+  "args": {
+    "actionId": "demo.playerArrested"
+  }
+}

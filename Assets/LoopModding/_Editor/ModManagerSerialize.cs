@@ -5,10 +5,10 @@ using LoopModding.Core;
 using LoopModding.Core.API;
 
 /// <summary>
-/// Custom inspector for ModManager showing loaded mods, parameters and ModAPI actions.
+/// Custom inspector for AddonManager showing loaded add-ons, parameters and AddonAPI actions.
 /// </summary>
-[CustomEditor(typeof(ModManager))]
-public class ModManagerEditor : Editor
+[CustomEditor(typeof(AddonManager))]
+public class AddonManagerEditor : Editor
 {
     private string eventName;
 
@@ -16,25 +16,25 @@ public class ModManagerEditor : Editor
     {
         DrawDefaultInspector();
 
-        ModManager manager = (ModManager)target;
+        AddonManager manager = (AddonManager)target;
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("🧩 Loaded Mods", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("🧩 Loaded Add-ons", EditorStyles.boldLabel);
 
-        if (Application.isPlaying && manager.HasLoadedMods())
+        if (Application.isPlaying && manager.HasLoadedAddons())
         {
-            foreach (var entry in manager.GetLoadedMods())
+            foreach (var entry in manager.GetLoadedAddons())
             {
-                EditorGUILayout.LabelField($"Event: {entry.Key} ({entry.Value.Count} mod(s))");
-                foreach (var mod in entry.Value)
+                EditorGUILayout.LabelField($"Event: {entry.Key} ({entry.Value.Count} add-on(s))");
+                foreach (var addon in entry.Value)
                 {
-                    EditorGUILayout.LabelField($"  → {mod.modName} | Action: {mod.action}");
+                    EditorGUILayout.LabelField($"  → {addon.addonName} | Action: {addon.action}");
                 }
             }
         }
         else
         {
-            EditorGUILayout.HelpBox("No mods loaded or not in play mode.", MessageType.Info);
+            EditorGUILayout.HelpBox("No add-ons loaded or not in play mode.", MessageType.Info);
         }
 
         EditorGUILayout.Space();
@@ -57,18 +57,18 @@ public class ModManagerEditor : Editor
         }
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("⚙️ Registered ModAPI Actions", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("⚙️ Registered AddonAPI Actions", EditorStyles.boldLabel);
 
-        if (ModAPI.HasRegisteredActions())
+        if (AddonAPI.HasRegisteredActions())
         {
-            foreach (var actionName in ModAPI.GetRegisteredActions())
+            foreach (var actionName in AddonAPI.GetRegisteredActions())
             {
                 EditorGUILayout.LabelField($"→ {actionName}");
             }
         }
         else
         {
-            EditorGUILayout.HelpBox("No actions registered in ModAPI.", MessageType.Warning);
+            EditorGUILayout.HelpBox("No actions registered in AddonAPI.", MessageType.Warning);
         }
     }
 }

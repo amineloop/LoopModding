@@ -1,0 +1,8 @@
+{
+  "actionId": "system.reloadAddons",
+  "events": ["ReloadFolders"],
+  "description": "Reload add-on, parameter and action definitions from disk.",
+  "category": "System",
+  "priority": 100,
+  "cooldown": 1.0
+}

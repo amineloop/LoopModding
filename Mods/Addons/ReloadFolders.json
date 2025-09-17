@@ -1,5 +1,5 @@
 {
-  "modName": "ReloadFolders",
+  "addonName": "ReloadFolders",
   "eventName": "ReloadFolders",
   "action": "ReloadFolders",
   "args": {

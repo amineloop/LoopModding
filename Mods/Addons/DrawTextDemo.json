@@ -1,19 +1,15 @@
 {
-  "modName": "WelcomeBanner",
+  "addonName": "DrawTextDemo",
   "eventName": "OnNewPlayer",
   "action": "DrawText",
   "args": {
-    "id": "welcomeBanner",
-    "text": "Welcome to @serverName!",
-    "x": 0.5,
-    "y": 0.85,
+    "text": "Welcome to the Loop",
     "normalized": true,
-    "fontSize": 42,
+    "x": 0.5,
+    "y": 0.9,
+    "fontSize": 48,
     "color": "#FFD700",
-    "fontStyle": "Bold",
     "alignment": "Center",
-    "duration": 6,
-    "width": 640,
-    "height": 80
+    "duration": 5
   }
 }

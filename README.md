@@ -2,56 +2,39 @@
 DISCLAIMER:
 ===========
 This is a simplified system inspired by SAMP's filterscript logic.
-Its goal is to streamline how .json mods and parameters can be used to trigger in-game Unity actions.
-The system includes basic demo actions (like PrintMessage, TeleportPlayer)
-but YOU are responsible for writing your own APIs for production usage.
+Its goal is to streamline how JSON add-ons and shared parameters trigger in-game Unity actions.
+The demo project includes a few sample actions (PrintMessage, TeleportPlayer, etc.),
+but **you** are responsible for implementing production-grade behaviours.
 =====================================================
 ```
-Please find a Quickstart Guide here : https://www.notion.so/LoopModding-1df9a990d4aa80369c33f04fd7256a7e?source=copy_link
 
-
-# LoopModding
-
-DISCLAIMER:
-===========
-This is a simplified system inspired by SAMP's filterscript logic.  
-Its goal is to streamline how .json mods and parameters can be used to trigger in-game Unity actions.  
-The system includes basic demo actions (like PrintMessage, TeleportPlayer)  
-but **YOU** are responsible for writing your own APIs for production usage.  
-=====================================================
-
-Please find a Quickstart Guide here:  
-https://www.notion.so/LoopModding-1df9a990d4aa80369c33f04fd7256a7e?source=copy_link
+Please find a Quickstart Guide here: https://www.notion.so/LoopModding-1df9a990d4aa80369c33f04fd7256a7e?source=copy_link
 
 ---
 
-LoopModding is a simple, flexible and JSON-based modding framework for Unity games.  
-It allows you to trigger actions through mod files and centralize game logic through a ModManager + ModAPI system.
+# LoopModding
+
+LoopModding is a simple, flexible and JSON-based add-on development framework for Unity games.
+It allows you to orchestrate gameplay logic through declarative add-on files, an `AddonManager` event bus and reusable `ActionManager` entries.
 
 ✨ Features
 -----------
-- 💡 Event-based mod execution  
+- 💡 Event-based add-on execution
 - 🧠 Parametric logic with support for `@parameters`
-- ⚡ Hot-reload support (manually via Reload button)  
-- 🛠️ Simple JSON mod files in `Mods/Addons`  
+- ⚡ Hot-reload support via the `ReloadFolders` action
+- 🛠️ JSON add-ons in `Mods/Addons` and JSON action definitions in `Mods/Actions`
 - 💬 Chat/message injection, teleportation, etc.
-- 📁 Global `parameters.json` support via `@` placeholders
+- 📁 Global `parameters.json` values referenced with `@placeholders`
 - 🖼️ UI helpers to render remote images and rich text overlays
-- 🎮 Runtime key/UI bindings that trigger mod events
+- 🎮 Runtime key/UI/trigger bridges that fire declarative actions
 
-🧩 Mod Structure
-----------------
-A mod is a `.json` file placed in `Mods/Addons/` and follows this structure:
-
-```json
-{ "modName": "...", "eventName": "...", "action": "...", "args": { ... } }
-```
-
-For instance, a simple welcome message can be defined as:
+🧩 Add-on Structure
+-------------------
+An add-on is a `.json` file placed in `Mods/Addons/` and follows this structure:
 
 ```json
 {
-  "modName": "WelcomeAdmin",
+  "addonName": "WelcomeAdmin",
   "eventName": "OnNewPlayer",
   "action": "PrintMessage",
   "args": {
@@ -61,59 +44,63 @@ For instance, a simple welcome message can be defined as:
 }
 ```
 
-📂 Parameters Example
----------------------
-In `Mods/Parameters/positions.json`:
+Each add-on listens to an event (`eventName`) and executes an AddonAPI action with optional arguments.
+Parameters can reference shared values loaded from `Mods/Parameters/*.json` using `@parameterKey` syntax.
+
+🎯 Action Definitions
+--------------------
+Actions live in `Mods/Actions/` and describe **what events should fire** when a bridge calls an action id:
 
 ```json
 {
-  "prisonX": -5.0,
-  "prisonY": 1.2,
-  "prisonZ": 3.5
+  "actionId": "system.reloadAddons",
+  "events": ["ReloadFolders"],
+  "description": "Reload add-on, parameter and action definitions from disk.",
+  "category": "System",
+  "priority": 100,
+  "cooldown": 1.0
 }
 ```
 
+When `ActionManager.TriggerAction("system.reloadAddons")` is invoked, it triggers the `ReloadFolders` event which executes every add-on bound to that event. Multiple events can be listed to chain workflows, and runtime payloads can be provided when triggering the action.
+
+🎛️ Input & UI Bridges
+---------------------
+- `ActionInputBridge` registers keyboard bindings and on-screen buttons that trigger an action id.
+- `ActionUIButton`, `ActionMenuItem` and `ActionTriggerZone` are lightweight components that forward UI clicks or collider events to the `ActionManager`.
+- Add-ons can chain actions programmatically via the `TriggerAction` AddonAPI action (or the static `AddonAPI.TriggerAction` method).
+
 🔄 Event Triggering
 -------------------
-Internally, events are triggered via:
+Internally, gameplay systems raise events through the `AddonManager`:
 
 ```csharp
-ModManager.Instance.TriggerEvent("OnPlayerArrested");
+AddonManager.Instance.TriggerEvent("OnPlayerArrested");
 ```
 
-This executes all loaded mods that listen to `OnPlayerArrested`.
+This executes all loaded add-ons that listen to `OnPlayerArrested`.
 
-🧠 Common Args (Automatically Handled)
---------------------------------------
-You can attach these special arguments to any mod, no matter the action:
+⚙️ Built-in AddonAPI Actions
+----------------------------
+| Action           | Description                                                      |
+|------------------|------------------------------------------------------------------|
+| ReloadFolders    | Reloads add-ons, parameters and actions from disk                |
+| PrintMessage     | Appends a message to the in-game chat window                     |
+| OnPlayerArrested | Sample workflow for player arrest rewards                        |
+| TeleportPlayer   | Teleports the player to the provided coordinates                 |
+| DrawText         | Renders stylable text overlays on the shared add-on canvas       |
+| ShowImage        | Downloads a remote image and displays it on the canvas           |
+| BindInput        | Maps a key or UI button to an action id via `ActionInputBridge`  |
+| UnbindInput      | Removes a previously registered input binding                    |
+| TriggerAction    | Invokes another action by id (for chaining behaviours)           |
+| UnlockAction     | Unlocks an action that requires explicit permission              |
+| LockAction       | Locks an action again                                            |
 
-| Arg            | Description                         |
-|----------------|-------------------------------------|
-| chatMessage    | Displays a message in the chat      |
-| playSound      | (Not implemented yet) Play a named sound    |
-| screenShake    | (Not implemented yet) Triggers camera shake |
+📺 UI Helpers
+------------
+The runtime automatically spawns a lightweight UI canvas (`AddonUiRuntime`) the first time you use the UI actions. Coordinates support **pixel** or **normalized (0..1)** positioning via the `normalized` / `buttonNormalized` booleans.
 
-These are handled automatically after the main action is executed.
-
-🧰 Built-in Actions
--------------------
-| Action            | Description                                             |
-|-------------------|---------------------------------------------------------|
-| ReloadFolders     | Reload mods and parameters at runtime                   |
-| PrintMessage      | Logs a message (use chatMessage too)                    |
-| OnPlayerArrested  | Teleports the player or prints a message for that event |
-| TeleportPlayer    | Teleports the player to x/y/z                           |
-| DrawText          | Renders stylable text overlays on the shared mod canvas |
-| ShowImage         | Downloads a remote image and displays it on the canvas  |
-| BindInput         | Maps a key or UI button to trigger a named mod event    |
-| UnbindInput       | Removes a previously registered input binding           |
-
-📺 UI Helpers & Input Bindings
-------------------------------
-The runtime automatically spawns a lightweight UI canvas (`ModUiRuntime`) the first time you use the new UI related actions.
-All coordinates support **pixel** or **normalized (0..1)** positioning via the `normalized` / `buttonNormalized` booleans.
-
-### DrawText
+### DrawText Example
 ```json
 {
   "action": "DrawText",
@@ -131,7 +118,7 @@ All coordinates support **pixel** or **normalized (0..1)** positioning via the `
 ```
 - Optional args: `id`, `width`, `height`, `pivotX/Y`, `alignment`, `raycastTarget`.
 
-### ShowImage
+### ShowImage Example
 ```json
 {
   "action": "ShowImage",
@@ -150,59 +137,48 @@ All coordinates support **pixel** or **normalized (0..1)** positioning via the `
 ```
 - Optional args: `rotation`, `color`, `alpha`, `pivotX/Y`.
 
-### BindInput / UnbindInput
+### BindInput Example
 ```json
 {
   "action": "BindInput",
   "args": {
-    "id": "reloadModsBinding",
-    "eventName": "ReloadFolders",
+    "id": "reloadAddonsBinding",
+    "actionId": "system.reloadAddons",
     "key": "F5",
-    "buttonLabel": "Reload Mods (F5)",
+    "trigger": "Down",
+    "buttonLabel": "Reload Add-ons (F5)",
     "buttonNormalized": true,
     "buttonX": 0.5,
     "buttonY": 0.1
   }
 }
 ```
-- Optional key args: `trigger` (`Down`, `Up`, `Held`), `holdDelay`, `repeatInterval`.
-- Optional button args: `buttonWidth`, `buttonHeight`, `buttonPivotX/Y`, `buttonDuration`, `buttonInteractable`.
+- Optional args: `buttonWidth`, `buttonHeight`, `buttonPivotX/Y`, `payload`, `holdDelay`, `repeatInterval`.
 
-Use `UnbindInput` with an `id` to remove either key or button at runtime.
-
-All built-in actions are automatically discovered at startup. To add your own, create a new C# script that inherits from `ModApiAction` and override `ActionName` + `Execute`:
+🛠️ Creating Custom Actions
+--------------------------
+All built-in actions are automatically discovered at startup. To add your own, create a new C# script that inherits from `AddonApiAction` and override `ActionName` + `Execute`:
 
 ```csharp
-using LoopModding.Core.API;
-using SimpleJSON;
-using UnityEngine;
-
-public class HealPlayerAction : ModApiAction
+public class HealPlayerAction : AddonApiAction
 {
     public override string ActionName => "HealPlayer";
 
     public override void Execute(JSONNode args)
     {
-        int amount = args?["amount"].AsInt ?? 25;
-        PlayerStats.Instance.Heal(amount);
-        Debug.Log($"[MOD] Healed player for {amount} HP");
+        float amount = args?["amount"].AsFloat ?? 25f;
+        // TODO: implement your healing logic
+        Debug.Log($"[AddonAPI] Healed player for {amount} HP");
     }
 }
 ```
 
-The class will be registered automatically thanks to the base class. You can still manually register actions at runtime with `ModAPI.Register(...)` if you need full control.
+The class will be registered automatically thanks to the base class. You can still manually register actions at runtime with `AddonAPI.Register(...)` if you need full control.
 
-🚀 Getting Started
-------------------
-1. Clone or drop the `/LoopModding` folder into your Unity project
-2. Attach `ModManager` to a GameObject in your startup scene
-3. Add your `.json` mods in `Mods/Addons/`
-4. (Optional) Add global variables in `Mods/Parameters/`
+📦 Installation Notes
+---------------------
+1. Place your add-on JSON files in `Mods/Addons/` and action definitions in `Mods/Actions/`.
+2. Attach `AddonManager` to a `DontDestroyOnLoad` GameObject in your bootstrap scene.
+3. Optional: add `ActionManager`, `ActionInputBridge` or bridge components to hook into UI/input systems.
 
-📜 License
-----------
-MIT — free to use and modify.
-
-💬 Credits
-----------
-Created by AMINE
+Have fun extending the framework and tailor the action system to your game! 😄

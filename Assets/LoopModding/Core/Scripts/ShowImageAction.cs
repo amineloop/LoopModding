@@ -7,7 +7,7 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Downloads an image from a remote URL and displays it on the mod UI canvas.
     /// </summary>
-    public class ShowImageAction : ModApiAction
+    public class ShowImageAction : AddonApiAction
     {
         public override string ActionName => "ShowImage";
 
@@ -15,14 +15,14 @@ namespace LoopModding.Core.API
         {
             if (args == null)
             {
-                Debug.LogWarning("[MOD] ShowImage called without arguments.");
+                Debug.LogWarning("[AddonAPI] ShowImage called without arguments.");
                 return;
             }
 
             string url = args.HasKey("url") ? args["url"].Value : string.Empty;
             if (string.IsNullOrWhiteSpace(url))
             {
-                Debug.LogWarning("[MOD] ShowImage requires a 'url' argument.");
+                Debug.LogWarning("[AddonAPI] ShowImage requires a 'url' argument.");
                 return;
             }
 
@@ -39,9 +39,9 @@ namespace LoopModding.Core.API
             bool preserveAspect = args.HasKey("preserveAspect") && args["preserveAspect"].AsBool;
 
             Color color = Color.white;
-            if (args.HasKey("color") && !ModUiRuntime.TryParseColor(args["color"].Value, out color))
+            if (args.HasKey("color") && !AddonUiRuntime.TryParseColor(args["color"].Value, out color))
             {
-                Debug.LogWarning($"[MOD] ShowImage received an invalid color '{args["color"].Value}'. Falling back to white.");
+                Debug.LogWarning($"[AddonAPI] ShowImage received an invalid color '{args["color"].Value}'. Falling back to white.");
                 color = Color.white;
             }
 
@@ -54,12 +54,12 @@ namespace LoopModding.Core.API
             Vector2 size = new Vector2(width, height);
             Vector2 pivot = new Vector2(pivotX, pivotY);
 
-            ModUiRuntime runtime = ModUiRuntime.EnsureInstance();
+            AddonUiRuntime runtime = AddonUiRuntime.EnsureInstance();
             string elementId = runtime.ShowImage(
                 id,
                 url,
                 position,
-                normalized ? ModUiRuntime.PositionMode.Normalized : ModUiRuntime.PositionMode.Pixel,
+                normalized ? AddonUiRuntime.PositionMode.Normalized : AddonUiRuntime.PositionMode.Pixel,
                 size,
                 pivot,
                 rotation,
@@ -67,7 +67,7 @@ namespace LoopModding.Core.API
                 preserveAspect,
                 duration);
 
-            Debug.Log($"[MOD] ShowImage displaying '{url}' with id '{elementId}'.");
+            Debug.Log($"[AddonAPI] ShowImage displaying '{url}' with id '{elementId}'.");
         }
     }
 }

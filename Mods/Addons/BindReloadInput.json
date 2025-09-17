@@ -1,13 +1,13 @@
 {
-  "modName": "BindReloadKey",
+  "addonName": "BindReloadKey",
   "eventName": "OnNewPlayer",
   "action": "BindInput",
   "args": {
-    "id": "reloadModsBinding",
-    "eventName": "ReloadFolders",
+    "id": "reloadAddonsBinding",
+    "actionId": "system.reloadAddons",
     "key": "F5",
     "trigger": "Down",
-    "buttonLabel": "Reload Mods (F5)",
+    "buttonLabel": "Reload Add-ons (F5)",
     "buttonNormalized": true,
     "buttonX": 0.5,
     "buttonY": 0.1,

@@ -1,0 +1,8 @@
+{
+  "actionId": "demo.playerArrested",
+  "events": ["OnPlayerArrested"],
+  "description": "Trigger the arrest workflow for testing rewards.",
+  "category": "Demo",
+  "priority": 10,
+  "requiresUnlock": true
+}

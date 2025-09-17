@@ -6,7 +6,7 @@ namespace LoopModding.Core.API
     /// <summary>
     /// Appends a message to the in-game chat window.
     /// </summary>
-    public class PrintMessageAction : ModApiAction
+    public class PrintMessageAction : AddonApiAction
     {
         public override string ActionName => "PrintMessage";
 
@@ -19,7 +19,7 @@ namespace LoopModding.Core.API
             }
             else
             {
-                Debug.LogWarning("[MOD] PrintMessage missing 'chatMessage' argument.");
+                Debug.LogWarning("[AddonAPI] PrintMessage missing 'chatMessage' argument.");
             }
         }
     }
