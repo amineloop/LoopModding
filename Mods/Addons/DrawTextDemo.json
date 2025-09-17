@@ -1,0 +1,19 @@
+{
+  "modName": "WelcomeBanner",
+  "eventName": "OnNewPlayer",
+  "action": "DrawText",
+  "args": {
+    "id": "welcomeBanner",
+    "text": "Welcome to @serverName!",
+    "x": 0.5,
+    "y": 0.85,
+    "normalized": true,
+    "fontSize": 42,
+    "color": "#FFD700",
+    "fontStyle": "Bold",
+    "alignment": "Center",
+    "duration": 6,
+    "width": 640,
+    "height": 80
+  }
+}

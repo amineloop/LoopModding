@@ -34,8 +34,10 @@ It allows you to trigger actions through mod files and centralize game logic thr
 - 🧠 Parametric logic with support for `@parameters`
 - ⚡ Hot-reload support (manually via Reload button)  
 - 🛠️ Simple JSON mod files in `Mods/Addons`  
-- 💬 Chat/message injection, teleportation, etc.  
+- 💬 Chat/message injection, teleportation, etc.
 - 📁 Global `parameters.json` support via `@` placeholders
+- 🖼️ UI helpers to render remote images and rich text overlays
+- 🎮 Runtime key/UI bindings that trigger mod events
 
 🧩 Mod Structure
 ----------------
@@ -101,6 +103,72 @@ These are handled automatically after the main action is executed.
 | PrintMessage      | Logs a message (use chatMessage too)                    |
 | OnPlayerArrested  | Teleports the player or prints a message for that event |
 | TeleportPlayer    | Teleports the player to x/y/z                           |
+| DrawText          | Renders stylable text overlays on the shared mod canvas |
+| ShowImage         | Downloads a remote image and displays it on the canvas  |
+| BindInput         | Maps a key or UI button to trigger a named mod event    |
+| UnbindInput       | Removes a previously registered input binding           |
+
+📺 UI Helpers & Input Bindings
+------------------------------
+The runtime automatically spawns a lightweight UI canvas (`ModUiRuntime`) the first time you use the new UI related actions.
+All coordinates support **pixel** or **normalized (0..1)** positioning via the `normalized` / `buttonNormalized` booleans.
+
+### DrawText
+```json
+{
+  "action": "DrawText",
+  "args": {
+    "text": "Welcome to @serverName!",
+    "x": 0.5,
+    "y": 0.85,
+    "normalized": true,
+    "fontSize": 42,
+    "color": "#FFD700",
+    "fontStyle": "Bold|Italic",
+    "duration": 6
+  }
+}
+```
+- Optional args: `id`, `width`, `height`, `pivotX/Y`, `alignment`, `raycastTarget`.
+
+### ShowImage
+```json
+{
+  "action": "ShowImage",
+  "args": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Logo_Unity_2015.png",
+    "id": "welcomeBadge",
+    "x": 0.9,
+    "y": 0.9,
+    "normalized": true,
+    "width": 256,
+    "height": 256,
+    "duration": 8,
+    "preserveAspect": true
+  }
+}
+```
+- Optional args: `rotation`, `color`, `alpha`, `pivotX/Y`.
+
+### BindInput / UnbindInput
+```json
+{
+  "action": "BindInput",
+  "args": {
+    "id": "reloadModsBinding",
+    "eventName": "ReloadFolders",
+    "key": "F5",
+    "buttonLabel": "Reload Mods (F5)",
+    "buttonNormalized": true,
+    "buttonX": 0.5,
+    "buttonY": 0.1
+  }
+}
+```
+- Optional key args: `trigger` (`Down`, `Up`, `Held`), `holdDelay`, `repeatInterval`.
+- Optional button args: `buttonWidth`, `buttonHeight`, `buttonPivotX/Y`, `buttonDuration`, `buttonInteractable`.
+
+Use `UnbindInput` with an `id` to remove either key or button at runtime.
 
 All built-in actions are automatically discovered at startup. To add your own, create a new C# script that inherits from `ModApiAction` and override `ActionName` + `Execute`:
 
